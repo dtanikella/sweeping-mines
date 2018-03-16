@@ -1,0 +1,65 @@
+.App {
+    text-align: center;
+}
+
+.App-logo {
+    animation: App-logo-spin infinite 20s linear;
+    height: 80px;
+}
+
+.App-header {
+    background-color: #222;
+    height: 150px;
+    padding: 20px;
+    color: white;
+}
+
+.App-title {
+    font-size: 1.5em;
+}
+
+.App-intro {
+    font-size: large;
+}
+
+.Game {
+    text-align: center;  
+}  
+
+table {
+    margin: 0 auto;
+}
+
+.cell {
+    border: 3px solid #bbb;
+    font-size: 20px;
+    width: 30px;
+    height: 22px;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 15px;
+}
+.open {
+    background-color:gray;   
+    color:white;
+    border-radius: 15px; 
+}
+.mine {
+    background: url("../images/bomb.svg") no-repeat center;
+    background-size: 30px 30px;
+}
+.flag {
+    /*background: url("../images/flag.svg") no-repeat center;*/
+    background-size: 25px 25px;
+    background-color:lightsalmon;  
+    border-radius: 15px; 
+}
+
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
