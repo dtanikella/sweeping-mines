@@ -40,6 +40,37 @@ class Grid extends Component {
     }
     return grid;
   }
+  openCell(i,j){
+    //find cell that was clicked, and reveal it
+    //if no mines, show surroundingMines (recursively)
+    //if mines, end the game
+    const grid = this.state.grid.slice();
+    if(!grid[i][j].isOpened){
+      if(grid[i][j].hasMine){
+        alert('you lose');
+        //end the game (TODO: option to restart the game)
+        //Make sure to have a message indicating ending of the game
+      }else{
+        //this.showCounts (recursively opens cells)
+      }
+    }
+  }
+  toggleFlag(i,j){
+    //toggle the display of a flag on a cell (check if opened first)
+  }
+  renderCell(i,j){
+    let gridCell = this.state.grid[i][j];
+    return (
+      <Cell
+        count={gridCell.count}
+        isOpened={gridCell.isOpened}
+        hasMine={gridCell.hasMine}
+        isFlagged={gridCell.isFlagged}
+        onClick={() => this.openCell(i,j)}
+        onContextMenu={() => this.toggleFlag(i,j)}
+      />
+    )
+  }
   render() {
     let that = this;
     var grid = this.state.grid.map((row, i) => {
