@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Grid from './components/Grid.js';
 import '../style/App.css';
 
 /**
@@ -7,7 +8,11 @@ import '../style/App.css';
 class App extends Component {
   render() {
     return (
-      <h1>CLEAN SLATE</h1>
+      <Grid
+        rows={10}
+        columns={10}
+        mines={9}
+      />
     );
   }
 }
