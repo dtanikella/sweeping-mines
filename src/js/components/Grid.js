@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
-import Cell from './Cell.js';
+import React, { Component } from "react";
+import Cell from "./Cell.js";
+import { createGrid, iterateSurroundingCells } from "../utils/gridUtils.js";
 //import '../style/Grid.css';
 
 /**
@@ -11,54 +12,60 @@ class Grid extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      grid : this.createGrid(props),
+      grid: createGrid(props.rows, props.columns, props.mines),
       isGameOver: false
     };
   }
-  createGrid(props){
-    let grid = [];
-    for(let i=0; i < props.rows; i++){
-      grid.push([]);
-      for(let j=0; j < props.columns; j++){
-        grid[i].push({
-          x:j,
-          y:i,
-          count:0,
-          isOpened: false,
-          hasMine: false,
-          isFlagged: false
-        })
-      }
-    }
-    for(let x=0; x < props.mines; x++){
-      let cell = grid[Math.floor(Math.random()*props.rows)][Math.floor(Math.random()*props.columns)];
-      if(cell.hasMine){
-        x--;
-      }else{
-        cell.hasMine = true;
-      }
-    }
-    return grid;
+  componentWillReceiveProps(nextProps) {
+    console.log("THIS IS WORKING");
+    this.setState({
+      grid: createGrid(props.rows, props.columns, props.mines)
+    });
   }
-  openCell(i,j){
-    //find cell that was clicked, and reveal it
-    //if no mines, show surroundingMines (recursively)
-    //if mines, end the game
+
+  openSurrounding(x, y) {
+    const grid = this.state.grid;
+    let cell = grid[x][y];
+    let fcn = (newX, newY) => {
+      let nextCell = grid[newX][newY];
+      if (nextCell.count === 0 || nextCell.hasMine === false) {
+        this.openCell(newX, newY);
+      }
+    };
+    iterateSurroundingCells(grid, x, y, fcn);
+  }
+  openCell(i, j) {
     const grid = this.state.grid.slice();
-    if(!grid[i][j].isOpened){
-      if(grid[i][j].hasMine){
-        alert('you lose');
-        //end the game (TODO: option to restart the game)
-        //Make sure to have a message indicating ending of the game
-      }else{
-        //this.showCounts (recursively opens cells)
+    if (!grid[i][j].isOpened && !grid[i][j].isFlagged) {
+      if (grid[i][j].hasMine) {
+        this.props.endGame("L");
+      } else {
+        grid[i][j].isOpened = true;
+        let newOpenedCells = this.state.openedCells + 1;
+        if (grid[i][j].count === 0) {
+          this.openSurrounding(i, j);
+        }
+        this.setState({
+          grid: grid,
+          openedCells: newOpenedCells
+        });
+        const didWin =
+          newOpenedCells ===
+          this.props.rows * this.props.columns - this.props.mines;
+        if (didWin) {
+          this.props.endGame("W");
+        }
       }
     }
   }
-  toggleFlag(i,j){
-    //toggle the display of a flag on a cell (check if opened first)
+  toggleFlag(i, j) {
+    const grid = this.state.grid.slice();
+    if (!grid[i][j].isOpened) {
+      grid[i][j].isFlagged = !grid[i][j].isFlagged;
+    }
+    this.setState({ grid: grid });
   }
-  renderCell(i,j){
+  renderCell(i, j) {
     let gridCell = this.state.grid[i][j];
     return (
       <Cell
@@ -66,32 +73,27 @@ class Grid extends Component {
         isOpened={gridCell.isOpened}
         hasMine={gridCell.hasMine}
         isFlagged={gridCell.isFlagged}
-        onClick={() => this.openCell(i,j)}
-        onContextMenu={() => this.toggleFlag(i,j)}
+        onClick={() => this.openCell(i, j)}
+        onContextMenu={e => {
+          e.preventDefault();
+          this.toggleFlag(i, j);
+        }}
       />
-    )
+    );
   }
   render() {
-    let that = this;
     var grid = this.state.grid.map((row, i) => {
       let rows = row.map((column, j) => {
-        return (that.renderCell(i,j));
+        return this.renderCell(i, j);
       });
-      return(
-        <tr>
-          {rows}
-        </tr>
-      )
+      return <tr>{rows}</tr>;
     });
     return (
       <table className="grid">
-        <tbody>
-          {grid}
-        </tbody>
+        <tbody>{grid}</tbody>
       </table>
     );
   }
-
 }
 
 export default Grid;
